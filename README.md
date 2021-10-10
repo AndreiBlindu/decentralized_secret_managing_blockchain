@@ -37,9 +37,22 @@ It searches for secrets in the blockchain, when a smart contract secret key has 
 
 ## Project dependencies
 
+### Node modules
 ### Web3.js
 You need Web3.js library to interact with an Ethereum smart contract from JavaScript through JSON/RPC communication protocol.
 
 Install it inside src/web_platform and src/whistleblower_app with the command :
 
 npm install web3
+
+### Python libraries
+### Flask dependencies
+pip install flask
+
+pip install flask_cors
+
+pip install flask_apscheduler
+
+### Web3
+pip install web3
+
