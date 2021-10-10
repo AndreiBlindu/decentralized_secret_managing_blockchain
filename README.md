@@ -2,7 +2,7 @@
 
 ## Project components
 
-### Smart contract 
+### Smart Contract 
 -> contracts/SmartContract.sol
 
 Contains the logic for secret keeping and revelation under certain conditions.
