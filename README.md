@@ -18,7 +18,7 @@ When the conditions for secret revelation are met they send their partial keys t
 ### * Whistleblower App -> src/whistleblower_app
 Client that allows the whistleblower to trigger the desired actions on the smart contract by entering the appropriate passwords
 
-* **Newsfeed App**
+### * Newsfeed App
 We suppose it to be a famous app used by the people potentially interested in the secret.
 It searches for secrets in the blockchain, when a smart contract secret key has been exposed it uses it to decrypt the respective secret file stored on IPFS and reveals it to the users.
 
