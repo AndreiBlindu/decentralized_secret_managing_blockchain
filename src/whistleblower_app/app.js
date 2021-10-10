@@ -1,3 +1,7 @@
+/**
+ * @author Andrei-Stefan Blindu
+ */
+
 (() => {
 
     function hashPassword(password) {

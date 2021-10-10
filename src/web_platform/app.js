@@ -1,3 +1,7 @@
+/**
+ * @author Andrei-Stefan Blindu
+ */
+
 (() => {
 
     var CryptoJS = require('crypto-js');

@@ -37,6 +37,18 @@ We suppose it to be a famous app used by the people potentially interested in th
 
 It searches for secrets in the blockchain, when a smart contract secret key has been exposed it uses it to decrypt the respective secret file stored on IPFS and reveals it to the users.
 
+
+## Compile and deploy Smart Contracts to Ethereum
+### Ganache
+Download Ganache https://www.trufflesuite.com/ganache in order to run a local blockchain.
+### Truffle
+Install truffle : npm install -g truffle
+
+Compile contracts : truffle compile
+
+Deploy contracts : truffle migrate --reset (with Ganache running)
+
+
 ## Project dependencies
 
 ### Node modules
