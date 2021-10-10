@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Web platform to upload secrets</title>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" />
+    </head>
+
+    <body>
+        <div id="uploadData">
+            <h3>Select your secret file</h3>
+            <input type="file" id="fileInput" class="form-control" />
+
+            <br>
+            <h3>Set your timer</h3>
+            How long do you want the secret to be kept before automatic revealation? 
+            <input type="number" name="timeout" id="timeout" />
+            <select list="timeUnitsList" name="timeUnit" id="timeUnit">
+                <option value=60>minutes</option>
+                <option value=3600>hours</option>
+                <option value=86400>days</option>
+            </select>
+
+            <br><br>
+            <h3>Choose your passwords</h3>
+            <ul>
+                <li>
+                    Password to inhibit revealation : 
+                    <input type="text" name="passwordInhibit" id="passwordInhibit" />
+                </li>
+                <li>
+                    Password to disable revealation for undefined time : 
+                    <input type="text" name="passwordLock" id="passwordLock" />
+                </li>
+                <li>
+                    Password to enable revealation (after having it disabled) : 
+                    <input type="text" name="passwordUnlock" id="passwordUnlock" />
+                </li>
+                <li>
+                    Password to reveal the secret instantly : 
+                    <input type="text" name="passwordImmediateReveal" id="passwordImmediateReveal" />
+                </li>
+            </ul>
+
+            <button type="button" name="uploadButton" id="uploadButton" class="btn btn-primary">Upload</button>
+        </div>
+
+        <br>
+        <div id="generateSmartContract">
+            <h3><p id="resultMessage"></p></h3>
+            <p id="fileHash"></p>
+            <p>
+                <button type="button" name="showKeyButton" id="showKeyButton" class="btn btn-primary">
+                    <span id="secretKeyButtonText"></span>
+                </button> <span id="secretKey"></span>
+            </p>
+            <p>Click the Confirm button to activate your smart contract on the blockchain and split your secret key!</p>
+            <button type="button" name="confirmButton" id="confirmButton" class="btn btn-primary">Confirm</button>
+            <button type="button" name="backButton" id="backButton" class="btn btn-primary">Back</button>
+        </div>
+
+        <script src="bundle.js"></script>
+    </body>
+</html>
