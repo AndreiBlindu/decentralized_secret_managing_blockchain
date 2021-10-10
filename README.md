@@ -28,7 +28,8 @@ When the conditions for secret revelation are met they send their partial keys t
 ### Whistleblower App 
 -> src/whistleblower_app
 
-Client that allows the whistleblower to trigger the desired actions on the smart contract by entering the appropriate passwords
+Client that allows the whistleblower to trigger the desired actions on the smart contract by entering the appropriate passwords.
+In this PoC it's not an actual app but a simple JS client.
 
 ### Newsfeed App
 We suppose it to be a famous app used by the people potentially interested in the secret.
