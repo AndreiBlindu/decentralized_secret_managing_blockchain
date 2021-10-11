@@ -23,7 +23,8 @@
         // Retrieve accounts from the local node
         const accounts = await web3.eth.getAccounts();
 
-        const address = "0xB50A453AAeb9098eecA967d61A248b87A7648a30"
+        const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
+        console.log(address);
         const abi = require('../../build/contracts/SmartContract.json').abi;
 
         // Set up a web3 contract, representing our deployed contract instance

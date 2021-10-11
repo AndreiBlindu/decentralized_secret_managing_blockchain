@@ -29,7 +29,7 @@
         console.log(accounts);
 
         
-        const address = "0xB50A453AAeb9098eecA967d61A248b87A7648a30"
+        const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
 
         const abi = require('../../build/contracts/SmartContract.json').abi;
         console.log(abi);
@@ -58,6 +58,8 @@
 
         await myContract.methods.setFileHash(hash)
         .send({ from: accounts[0] });
+
+        console.log("Smart Contract activated and parameters successfully uploaded!");
     }
 
     function hashPassword(password) {
