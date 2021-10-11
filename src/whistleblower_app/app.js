@@ -23,7 +23,7 @@
         // Retrieve accounts from the local node
         const accounts = await web3.eth.getAccounts();
 
-        const address = "0xC3072C8cf69c83e734c40160Ca7d6a62519e8B0e"
+        const address = "0xB50A453AAeb9098eecA967d61A248b87A7648a30"
         const abi = require('../../build/contracts/SmartContract.json').abi;
 
         // Set up a web3 contract, representing our deployed contract instance
@@ -32,7 +32,8 @@
 
         var response = await myContract.methods.action(hashedPassword)
         .call();
-        //.send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        //.send({ from: accounts[0] });
+        console.log(response);
         return response;
     }
 

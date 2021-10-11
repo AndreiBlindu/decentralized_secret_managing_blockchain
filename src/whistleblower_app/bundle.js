@@ -39270,12 +39270,12 @@ module.exports={
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xC3072C8cf69c83e734c40160Ca7d6a62519e8B0e",
-      "transactionHash": "0x6a9b6ff9a8e31be4990696427cc506a2b1bdaaee7b4701ca96d3b22015691cba"
+      "address": "0xB50A453AAeb9098eecA967d61A248b87A7648a30",
+      "transactionHash": "0x4b82bdd1811112d4d8f4a422eb11932dc490afea071f14f021634e456f7a082f"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-10-10T08:20:12.818Z",
+  "updatedAt": "2021-10-11T13:01:01.835Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": ": Andrei-Stefan Blindu",
@@ -39290,6 +39290,10 @@ module.exports={
   }
 }
 },{}],243:[function(require,module,exports){
+/**
+ * @author Andrei-Stefan Blindu
+ */
+
 (() => {
 
     function hashPassword(password) {
@@ -39311,7 +39315,7 @@ module.exports={
         // Retrieve accounts from the local node
         const accounts = await web3.eth.getAccounts();
 
-        const address = "0xC3072C8cf69c83e734c40160Ca7d6a62519e8B0e"
+        const address = "0xB50A453AAeb9098eecA967d61A248b87A7648a30"
         const abi = require('../../build/contracts/SmartContract.json').abi;
 
         // Set up a web3 contract, representing our deployed contract instance
@@ -39320,7 +39324,8 @@ module.exports={
 
         var response = await myContract.methods.action(hashedPassword)
         .call();
-        //.send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        //.send({ from: accounts[0] });
+        console.log(response);
         return response;
     }
 

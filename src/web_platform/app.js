@@ -29,7 +29,7 @@
         console.log(accounts);
 
         
-        const address = "0xC3072C8cf69c83e734c40160Ca7d6a62519e8B0e"
+        const address = "0xB50A453AAeb9098eecA967d61A248b87A7648a30"
 
         const abi = require('../../build/contracts/SmartContract.json').abi;
         console.log(abi);
@@ -42,22 +42,22 @@
         console.log(value);
 
         await myContract.methods.setTimeout(timeout)
-        .send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        .send({ from: accounts[0] });   // , gas: 50000, gasPrice: 20000000000
 
         await myContract.methods.setPasswordInhibit(passwordInhibit)
-        .send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        .send({ from: accounts[0] });
 
         await myContract.methods.setPasswordLock(passwordLock)
-        .send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        .send({ from: accounts[0] });
 
         await myContract.methods.setPasswordUnlock(passwordUnlock)
-        .send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        .send({ from: accounts[0] });
 
         await myContract.methods.setPasswordImmediateReveal(passwordImmediateReveal)
-        .send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        .send({ from: accounts[0] });
 
         await myContract.methods.setFileHash(hash)
-        .send({ from: accounts[0], gas: 5, gasPrice: 20000000000 });
+        .send({ from: accounts[0] });
     }
 
     function hashPassword(password) {
@@ -121,7 +121,7 @@
         var shares = [];
 
         for (let i=0; i < TOTALE_SHARES; i++) {
-            let x = Math.floor(Math.random() * 1000000000000); // the x value of the points is a random number between 0 and 100000
+            let x = Math.floor(Math.random() * 100); // the x value of the points is a random number between 0 and 100000
             let y = secret;                       // I use Math.floor to avoid floating point approssimations as much as I can
             // we build the polinom : y = P(x) = secret + c1*x + ... + c_n * x^(threshold-1)
             for (let j=1; j < THRESHOLD; j++) {
