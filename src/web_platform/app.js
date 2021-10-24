@@ -59,14 +59,21 @@
         await myContract.methods.setFileHash(hash)
         .send({ from: accounts[0] });
 
+        await myContract.methods.setThreshold(THRESHOLD)
+        .send({ from: accounts[0] });  
+
         console.log("Smart Contract activated and parameters successfully uploaded!");
     }
 
     function hashPassword(password) {
         var algo = CryptoJS.algo.SHA256.create();
-        var salt = "SUPER-S@LT!";
+        var salt = "SUPER-S@LT!"; // il salt non deve essere uguale per tutti (per evitare attacchi brute-froce con approcci stat)
+        // uso generatore pseudo random con id sequenziale, uno corrispondente a ogni password
+        // in questo modo il salt sarebbe diverso per le varie password
+        // oppure salvare i salt in locale
         algo.update(password, 'utf-8');
         algo.update(CryptoJS.SHA256(salt), 'utf-8');
+        // si potrebbe usare un algo più robusto di sha256
         
         return algo.finalize().toString(CryptoJS.enc.Base64);
     }
@@ -118,19 +125,34 @@
         reader.readAsArrayBuffer(file); 
     }
 
+    function generateCoefficients(secret) {
+        var coefficients = [];
+        coefficients.push(secret);
+        for (let i=1; i < THRESHOLD; i++) {
+            coefficients.push(Math.floor(Math.random() * 100000));
+        }
+        console.log(coefficients);
+        return coefficients;
+    }
+
+    function polynom(x, coefficients) {
+        var y = 0;
+
+        for (let i=0; i < coefficients.length; i++) {
+            y += coefficients[i] * Math.pow(x, i);
+        }
+
+        return y;
+    }
+
     // Splits the secret key in many shares according to Shamir's algorithm
     function generateShares(secret) {
         var shares = [];
+        var coefficients = generateCoefficients(secret);
 
-        for (let i=0; i < TOTALE_SHARES; i++) {
-            let x = Math.floor(Math.random() * 100); // the x value of the points is a random number between 0 and 100000
-            let y = secret;                       // I use Math.floor to avoid floating point approssimations as much as I can
-            // we build the polinom : y = P(x) = secret + c1*x + ... + c_n * x^(threshold-1)
-            for (let j=1; j < THRESHOLD; j++) {
-                let coefficient = Math.floor(Math.random()*10);
-                y += coefficient * Math.pow(x, j);
-            }
-            shares.push([x,y]);
+        for (let i=1; i <= TOTALE_SHARES; i++) {
+            let x = Math.floor(Math.random() * 100000);
+            shares.push([x, polynom(x, coefficients)])
         }
 
         return shares;
@@ -140,10 +162,10 @@
         const basePort = 5000;
         // every devices listens to a different port (basePort + deviceId)
         const url = "http://localhost:"+(basePort+deviceId)+"/sharePartialKeys";
-        
+
         fetch(url, {
             method: "POST",                
-            body: JSON.stringify({ partialKey : partialKey}),
+            body: JSON.stringify({ "partialKey" : partialKey}),
             headers: {"Content-Type": "application/json"}
         }).catch((error) => {
             console.log(error);
@@ -156,33 +178,64 @@
         }
     }
 
+    function reconstructSecret(f,n)
+    {
+        let result = 0; // Initialize result
+    
+        for (let i = 0; i < n; i++)
+        {
+            // Compute individual terms of the formula
+            let term = f[i][1];
+            for (let j = 0; j < n; j++)
+            {
+                if (j != i)
+                    term = term*(f[j][0]) / (f[j][0] - f[i][0]);
+            }
+    
+            // Add current term to result
+            result += term;
+        }
+    
+        return Math.round(result);
+    }
+
     function shamirSecretSharing(secret) {
-        /*const { split } = require('shamir');
+        /*const { split, join } = require('shamir');
         const { randomBytes } = require('crypto');
 
         // convert between string and Uint8Array
         const utf8Encoder = new TextEncoder();
+
+        const utf8Decoder = new TextDecoder();
         
         const secretBytes = utf8Encoder.encode(secret);
         // parts is a object whos keys are the part number and 
         // values are shares of type Uint8Array
         console.log("secretBytes : " + secretBytes);
 
-        const partialKeys = split(randomBytes, PARTS, QUORUM, secretBytes);
+        const partialKeys = split(randomBytes, TOTALE_SHARES, THRESHOLD, secretBytes);
         console.log("Partial Keys : ");
         console.log(partialKeys);
-        console.log(partialKeys[0]);
 
-        // write the partialKeys to config file
-        //writeToFile(partialKeys);
+        const recovered = join(partialKeys);
+        console.log(utf8Decoder.decode(recovered));
 
         // send partial keys to devices
-        //sendPartialKeys2Devices(partialKeys);*/
+        var partialKeysArray = Array.from(partialKeys);
+        sendPartialKeys2Devices(partialKeysArray);*/
 
         var secretValue = parseInt(secret);
 
-        var shares = generateShares(secretValue);
-        console.log(shares);
+        do {
+            var shares = generateShares(secretValue);
+            console.log(shares);
+
+            let recontruction = reconstructSecret(shares, THRESHOLD);
+            console.log(recontruction);
+
+            var err = recontruction - secret;
+            console.log("error : %d", err);
+        } while(err != 0);
 
         sendPartialKeys2Devices(shares);
 
@@ -203,7 +256,7 @@
 
             let file = document.getElementById("fileInput").files[0];
             // random generated key
-            key = "" + Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);  // key must be a string
+            key = "" + Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER/100));  // key must be a string
             console.log(key);
             encryptAndUpload2IPFS(file);
             document.getElementById("uploadData").style.display = "none";

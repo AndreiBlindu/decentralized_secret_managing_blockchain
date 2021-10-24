@@ -7,12 +7,22 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_apscheduler import APScheduler
 
+import json
+
 app = Flask(__name__)
 CORS(app) # allow access from all domains to avoid cors policy errors
 
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
+
+## Devo mettere meccanismo per evitare che horcrux fake mandino info false
+## Indentificare horcrux -> 
+## La web app manda al horcrux un nonce e chiave pubblica (rsa) 
+## la chiave privata ce l'hanno horc. e proprietario
+## horc. cifrano con chiave privata part_shamir + nonce 
+## dal nonce verifico che è un horcrux
+## la pubblica viene messa sulla blockchain
 
 def check_smart_contract(partial_key):
     print("Checking smart contract ...")
@@ -27,10 +37,10 @@ def check_smart_contract(partial_key):
 # API to receive the partial keys
 @app.route('/sharePartialKeys', methods=['POST'])
 def receive_partial_keys():
-    partial_key = request.get_json()
+    partial_key = request.get_json()['partialKey']
     print(partial_key)
     # once it receives the partial key it schedules the smart contract checking task
-    app.apscheduler.add_job(func=check_smart_contract, trigger='interval', args=[partial_key], id='0')
+    #app.apscheduler.add_job(func=check_smart_contract, trigger='interval', args=[partial_key], id='0')
     return "OK", 200
 
 

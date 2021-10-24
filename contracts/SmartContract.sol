@@ -7,7 +7,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract SmartContract {
     string public fileHash;     // hash to retrieve the encrypted file from IPFS
-    string public secretKey;    // key to decrypt the secret file
+    uint256 public secretKey;    // key to decrypt the secret file
 
     string private passwordInhibit;  // to inhibit revelation for a certain time (timeout)
     string private passwordLock;    // to disable revelation for undefined time
@@ -17,7 +17,16 @@ contract SmartContract {
     bool private enableRevelation = true;
     uint256 public timeout; 
     uint256 private timeSpan;   // time span the secret remains inhibited for   
-    int private requestCounter = 0;   
+    int private requestCounter = 0;
+
+    struct PartialKey {     // define the structure of a partialKey
+        uint256 x;
+        uint256 y;
+    }
+
+    PartialKey[] public partialKeys;  // dynamic size array that stores the partial keys received by the devices
+    uint public THRESHOLD;   // minimum numeber of shares required to reconstruct the secret
+    uint public currentSharesNumber = 0;    // current number of partial keys in the smart contract
 
 
     function setEnableRevelation(bool _flag) private {
@@ -32,6 +41,7 @@ contract SmartContract {
     function instantRevelation() private {
         // by setting the timeout to the current timestamp I make it expire
         timeout = block.timestamp;
+        enableRevelation = true;
     }
 
     function inhibitRevelation() private {
@@ -69,13 +79,15 @@ contract SmartContract {
         return ((block.timestamp > timeout) && enableRevelation);
     }
 
-    /**
-    Qui devo scrivere le funzioni che permettono allo smart contract di ricevere le chiavi parziali dai dispositivi
-    e di ricostruire la chiave segreta a partire da questi frammenti.
-    Per ricevere le chiavi faccio una funzione che aggiunge a un array gli elementi passati come argomento,
-    mentre per ricostruire il segreto dovrò usare l'interpolazione di Lagrange come previsto dall'algoritmo di Shamir.
-     */
-
+    
+    // FUNCTIONS THAT ALLOW THE SMART CONTRACT TO RECEIVE PARTIAL KEYS FROM THE DEVICES
+    // AND USE THEM TO RECONSTRUCT THE SECRET KEY
+    function sendPartialKey(uint256 _partialKey_x, uint256 _partialKey_y) public {
+        PartialKey memory partialKey = PartialKey(_partialKey_x, _partialKey_y);
+        partialKeys.push(partialKey);
+        currentSharesNumber = partialKeys.length;
+    }
+    
 
     // SETTERS
     function setFileHash(string memory _fileHash) public {
@@ -96,5 +108,8 @@ contract SmartContract {
     function setTimeout(uint256 _time) public {
         timeSpan = _time;
         timeout = block.timestamp + timeSpan;
+    }
+    function setThreshold(uint _threshold) public{
+        THRESHOLD = _threshold;
     }
 }
