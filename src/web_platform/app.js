@@ -65,8 +65,15 @@
         await myContract.methods.setThreshold(THRESHOLD)
         .send({ from: accounts[0] });  
 
-        //await myContract.methods.setPublicKey(horcruxPublicKey)
-        //.send({ from: accounts[0] });
+        // Since the key is very long we cannot send it in a single transaction but we have
+        // to divide it in smaller substrings
+        let i=0;
+        let step=30;
+        do {
+            await myContract.methods.setPublicKey(horcruxPublicKey.substring(i, i+step))
+            .send({ from: accounts[0] });
+            i += step;
+        } while(i < horcruxPublicKey.length)
 
         console.log("Smart Contract activated and parameters successfully uploaded!");
     }

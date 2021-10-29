@@ -27,7 +27,9 @@ contract SmartContract {
     PartialKey[] public partialKeys;  // dynamic size array that stores the partial keys received by the devices
     uint public THRESHOLD;   // minimum numeber of shares required to reconstruct the secret
     uint public currentSharesNumber = 0;    // current number of partial keys in the smart contract
-    string public publicKey;    // public key that decrypts the shares encrypted by horcruxes with their private key
+    string[] public publicKey;    // public key that decrypts the shares encrypted by horcruxes with their private key
+    // it's an array because since it's a very long string there's the risk of going out of gas if we get it from a 
+    // single big transaction so we divide it in smaller substrings
 
 
     function setEnableRevelation(bool _flag) private {
@@ -88,6 +90,11 @@ contract SmartContract {
         partialKeys.push(partialKey);
         currentSharesNumber = partialKeys.length;
     }
+
+    // FUNCTION THAT RETURNS THE NUMBER OF SUBSTRINGS OF THE PUBLIC KEY
+    function getPublicKeySubstringsNumber() public view returns (uint) {
+        return publicKey.length;
+    }
     
 
     // SETTERS
@@ -114,6 +121,6 @@ contract SmartContract {
         THRESHOLD = _threshold;
     }
     function setPublicKey(string memory _publicKey) public {
-        publicKey = _publicKey;
+        publicKey.push(_publicKey);
     }
 }

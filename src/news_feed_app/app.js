@@ -44,11 +44,18 @@
         var sharesNumber = await myContract.methods.currentSharesNumber().call();
         console.log(sharesNumber);
 
+        var publicKey = "";
         var partialKeys = [];
         var secretKey;
 
         if (sharesNumber >= threshold) {
             // Get the partial keys from the smart contract
+            let publicKeySubstringsNumber = await myContract.methods.getPublicKeySubstringsNumber().call();
+            for (let i=0; i < publicKeySubstringsNumber; i++) {
+                publicKey += (await myContract.methods.publicKey(i).call());
+            }
+            console.log(publicKey);
+
             for (let i=0; i < sharesNumber; i++) {
                 partialKeys.push(await myContract.methods.partialKeys(i).call());
             }
