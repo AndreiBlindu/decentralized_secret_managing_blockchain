@@ -4,11 +4,15 @@
 
 (() => {
 
-    function hashPassword(password) {
+    function hashPassword(password, index) {
         var CryptoJS = require('crypto-js');
 
         var algo = CryptoJS.algo.SHA256.create();
-        var salt = "SUPER-S@LT!";
+
+        // get the right salt from local storage
+        var salt = window.localStorage.getItem('salt_'+index);
+        console.log(salt);
+
         algo.update(password, 'utf-8');
         algo.update(CryptoJS.SHA256(salt), 'utf-8');
         
@@ -20,8 +24,6 @@
         // Set up web3 object, connected to the local development network
         //const web3 = new Web3('http://localhost:7545');
         var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
-        // Retrieve accounts from the local node
-        const accounts = await web3.eth.getAccounts();
 
         const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
         console.log(address);
@@ -43,7 +45,9 @@
             var password = document.getElementById("password").value;
             console.log(password);
 
-            var hashedPassword = hashPassword(password);
+            var index = document.getElementById("saltIndex").value;
+
+            var hashedPassword = hashPassword(password, index);
             console.log(hashedPassword);
 
             executeContractAction(hashedPassword).then((response) => {

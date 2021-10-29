@@ -8,7 +8,7 @@
 
     var passwordInhibit = "";
     var passwordLock = "";
-    var passwordUnlock = "";
+    //var passwordUnlock = "";
     var passwordImmediateReveal = "";
     var key = "";
     var timeout = 0;
@@ -50,8 +50,8 @@
         await myContract.methods.setPasswordLock(passwordLock)
         .send({ from: accounts[0] });
 
-        await myContract.methods.setPasswordUnlock(passwordUnlock)
-        .send({ from: accounts[0] });
+        //await myContract.methods.setPasswordUnlock(passwordUnlock)
+        //.send({ from: accounts[0] });
 
         await myContract.methods.setPasswordImmediateReveal(passwordImmediateReveal)
         .send({ from: accounts[0] });
@@ -65,15 +65,24 @@
         console.log("Smart Contract activated and parameters successfully uploaded!");
     }
 
-    function hashPassword(password) {
+    function hashPassword(password, index) {
         var algo = CryptoJS.algo.SHA256.create();
-        var salt = "SUPER-S@LT!"; // il salt non deve essere uguale per tutti (per evitare attacchi brute-froce con approcci stat)
+        var crypto = require("crypto");
+
+        // salt is a random generated 10 bytes string
+        var salt = crypto.randomBytes(10).toString('hex'); 
+        // we save the generated salt in a local storage
+        window.localStorage.setItem('salt_'+index, salt);  
+
+        
+        // il salt non deve essere uguale per tutti (per evitare attacchi brute-froce con approcci stat)
         // uso generatore pseudo random con id sequenziale, uno corrispondente a ogni password
         // in questo modo il salt sarebbe diverso per le varie password
         // oppure salvare i salt in locale
+
         algo.update(password, 'utf-8');
         algo.update(CryptoJS.SHA256(salt), 'utf-8');
-        // si potrebbe usare un algo più robusto di sha256
+        // we could use a cryptographic algorithm better than sha256 but is adeguate
         
         return algo.finalize().toString(CryptoJS.enc.Base64);
     }
@@ -241,24 +250,51 @@
 
     }
 
+    // Function that reorders an array randomly
+    function shuffle(array) {
+        let currentIndex = array.length,  randomIndex;
+      
+        // While there remain elements to shuffle...
+        while (currentIndex != 0) {
+      
+          // Pick a remaining element...
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+      
+          // And swap it with the current element.
+          [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+        }
+      
+        return array;
+      }
+
     window.onload = () => {
 
         document.getElementById("uploadData").style.display = "block";
         document.getElementById("generateSmartContract").style.display = "none";
 
         document.getElementById("uploadButton").addEventListener("click", () => {
-            passwordInhibit = hashPassword(document.getElementById("passwordInhibit").value);
-            passwordLock = hashPassword(document.getElementById("passwordLock").value);
-            passwordUnlock = hashPassword(document.getElementById("passwordUnlock").value);
-            passwordImmediateReveal = hashPassword(document.getElementById("passwordImmediateReveal").value);
+            var indexArray = shuffle([0,1,2]);
+            document.getElementById("index0").innerHTML = indexArray[0];
+            document.getElementById("index1").innerHTML = indexArray[1];
+            document.getElementById("index2").innerHTML = indexArray[2];
+
+            passwordInhibit = hashPassword(document.getElementById("passwordInhibit").value, indexArray[0]);
+            passwordLock = hashPassword(document.getElementById("passwordLock").value, indexArray[1]);
+            //passwordUnlock = hashPassword(document.getElementById("passwordUnlock").value);
+            passwordImmediateReveal = hashPassword(document.getElementById("passwordImmediateReveal").value, indexArray[2]);
 
             timeout = document.getElementById("timeout").value * document.getElementById("timeUnit").value;
 
             let file = document.getElementById("fileInput").files[0];
+
             // random generated key
             key = "" + Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER/100));  // key must be a string
             console.log(key);
+
             encryptAndUpload2IPFS(file);
+
             document.getElementById("uploadData").style.display = "none";
             document.getElementById("generateSmartContract").style.display = "block";
 
@@ -272,7 +308,7 @@
             console.log(timeout);
             console.log(passwordInhibit);
             console.log(passwordLock);
-            console.log(passwordUnlock);
+            //console.log(passwordUnlock);
             console.log(passwordImmediateReveal);
             console.log("File Hash : "+hash);
 

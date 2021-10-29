@@ -32,10 +32,10 @@
                     Password to disable revealation for undefined time : 
                     <input type="text" name="passwordLock" id="passwordLock" />
                 </li>
-                <li>
+                <!--<li>
                     Password to enable revealation (after having it disabled) : 
                     <input type="text" name="passwordUnlock" id="passwordUnlock" />
-                </li>
+                </li>-->
                 <li>
                     Password to reveal the secret instantly : 
                     <input type="text" name="passwordImmediateReveal" id="passwordImmediateReveal" />
@@ -49,6 +49,14 @@
         <div id="generateSmartContract">
             <h3><p id="resultMessage"></p></h3>
             <p id="fileHash"></p>
+            <p>
+                Remember the indexes associated to each of your passwords (you'll need it later) :
+                <ul>
+                    <li>Password to inhibit revelation : index=<span id="index0"></span></li>
+                    <li>Password to disable revelation : index=<span id="index1"></span></li>
+                    <li>Password to revealImmediately : index=<span id="index2"></span></li>
+                </ul>
+            </p>
             <p>
                 <button type="button" name="showKeyButton" id="showKeyButton" class="btn btn-primary">
                     <span id="secretKeyButtonText"></span>

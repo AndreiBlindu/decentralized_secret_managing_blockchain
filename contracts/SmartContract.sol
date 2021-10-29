@@ -11,7 +11,7 @@ contract SmartContract {
 
     string private passwordInhibit;  // to inhibit revelation for a certain time (timeout)
     string private passwordLock;    // to disable revelation for undefined time
-    string private passwordUnlock;  // to enable revelation
+    //string private passwordUnlock;  // to enable revelation
     string private passwordImmediateReveal; // to reveal instantly
 
     bool private enableRevelation = true;
@@ -31,11 +31,11 @@ contract SmartContract {
 
     function setEnableRevelation(bool _flag) private {
         enableRevelation = _flag;
-        if (_flag) {
+        /*if (_flag) {
             // if revelation was disabled just setting enableRevelation to true is not enough,
             // we have to update the timeout to a future value as well
             setTimeout(timeSpan);
-        }
+        }*/
     }
 
     function instantRevelation() private {
@@ -59,11 +59,11 @@ contract SmartContract {
             setEnableRevelation(false);
             return "Secret revelation disabled for undefined time";
         }
-        else if (keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(passwordUnlock))) {
+        /*else if (keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(passwordUnlock))) {
             setEnableRevelation(true);
             return string(abi.encodePacked("Secret revelation enabled. The secret will be revealed ",
                                             timeSpan, " seconds from now"));
-        }
+        }*/
         else if (keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(passwordImmediateReveal))) {
             instantRevelation();
             return "The secret has been revealed!";
@@ -99,9 +99,9 @@ contract SmartContract {
     function setPasswordLock(string memory _passwordLock) public {
         passwordLock = _passwordLock;
     }
-    function setPasswordUnlock(string memory _passwordUnlock) public {
+    /*function setPasswordUnlock(string memory _passwordUnlock) public {
         passwordUnlock = _passwordUnlock;
-    }
+    }*/
     function setPasswordImmediateReveal(string memory _passwordImmediateReveal) public {
         passwordImmediateReveal = _passwordImmediateReveal;
     }
