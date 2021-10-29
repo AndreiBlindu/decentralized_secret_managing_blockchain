@@ -43,20 +43,23 @@
         // Get the current number of partial keys
         var sharesNumber = await myContract.methods.currentSharesNumber().call();
         console.log(sharesNumber);
-        // Get the partial keys from the smart contract
-        var partialKeys = [];
-        for (let i=0; i < sharesNumber; i++) {
-            partialKeys.push(await myContract.methods.partialKeys(i).call());
-        }
-        console.log(partialKeys);
 
+        var partialKeys = [];
         var secretKey;
 
-        if (partialKeys.length >= threshold) {
+        if (sharesNumber >= threshold) {
+            // Get the partial keys from the smart contract
+            for (let i=0; i < sharesNumber; i++) {
+                partialKeys.push(await myContract.methods.partialKeys(i).call());
+            }
+            console.log(partialKeys);
+            
             // qui devo mettere codice per decrittare le chiavi parziali con la chiave pubblica messa sulla blockchain
             // e successivamente usarle per ricostruire la chiave segreta attraverso l'interpolazione di lagrange
         } else {
             console.log("There are not enough partial keys to reconstruct the secret decryption key yet!");
+            document.getElementById("secret").innerHTML = 
+            "There are not enough partial keys to reconstruct the secret decryption key yet!";
         }
 
         return secretKey;

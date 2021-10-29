@@ -24,6 +24,8 @@
         // Set up web3 object, connected to the local development network
         //const web3 = new Web3('http://localhost:7545');
         var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+        // Retrieve accounts from the local node
+        const accounts = await web3.eth.getAccounts();
 
         const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
         console.log(address);

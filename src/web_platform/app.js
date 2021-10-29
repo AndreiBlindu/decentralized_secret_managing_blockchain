@@ -19,6 +19,10 @@
     // the minimum required to recover
     const THRESHOLD = 3;
 
+    var horcruxPublicKey;
+    var horcruxPrivateKey;
+    var nonce = 0;
+
     async function activateSmartContract() {
         const Web3 = require('web3');
         // Set up web3 object, connected to the local development network
@@ -27,7 +31,6 @@
         // Retrieve accounts from the local node
         const accounts = await web3.eth.getAccounts();
         console.log(accounts);
-
         
         const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
 
@@ -62,7 +65,33 @@
         await myContract.methods.setThreshold(THRESHOLD)
         .send({ from: accounts[0] });  
 
+        //await myContract.methods.setPublicKey(horcruxPublicKey)
+        //.send({ from: accounts[0] });
+
         console.log("Smart Contract activated and parameters successfully uploaded!");
+    }
+
+    function generateRSAKeys() {
+        var forge = require('node-forge');
+
+        let keyPair = forge.pki.rsa.generateKeyPair(1024);  // generate 1024 bits key pair
+        let encryptionKey = keyPair.publicKey;  // In RSA public key is usually used for encryption
+        let decryptionKey = keyPair.privateKey; // In RSA private key is usually used for decryption
+
+        // Here we are going to exchange the use of the keys, since it's not important to hide the message but
+        // to be sure that the message comes from an horcrux,
+        // so we are going to use RSA public/encryption key as private key
+        // and RSA private/decryption key as public key
+        horcruxPrivateKey = forge.pki.publicKeyToPem(encryptionKey);
+        horcruxPublicKey = forge.pki.privateKeyToPem(decryptionKey);
+        // the private key is going to be sent to the horcruxes together with the shamir's partial key and the nonce
+        // while the public key is going to be put on the smart contract
+
+        // Now we generate the nonce that is a pseudo-random generated number that will allow us
+        // to identify that a message is coming from an authorized horcrux and not from a fake one
+        nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+        // the nonce is saved in local storage
+        window.localStorage.setItem('nonce', nonce);
     }
 
     function hashPassword(password, index) {
@@ -172,9 +201,15 @@
         // every devices listens to a different port (basePort + deviceId)
         const url = "http://localhost:"+(basePort+deviceId)+"/sharePartialKeys";
 
+        // together with the partialKey we send also the private key and 
+        // the nonce to the horcruxes
         fetch(url, {
             method: "POST",                
-            body: JSON.stringify({ "partialKey" : partialKey}),
+            body: JSON.stringify({ 
+                "partialKey" : partialKey, 
+                "privateKey" : horcruxPrivateKey,
+                "nonce" : nonce
+            }),
             headers: {"Content-Type": "application/json"}
         }).catch((error) => {
             console.log(error);
@@ -311,6 +346,12 @@
             //console.log(passwordUnlock);
             console.log(passwordImmediateReveal);
             console.log("File Hash : "+hash);
+
+            // Generate public-private key pair and nonce for horcrux
+            generateRSAKeys();
+            console.log(horcruxPrivateKey);
+            console.log(horcruxPublicKey);
+            console.log(nonce);
 
             // Activate smart contract on the blockchain and set the parameters
             activateSmartContract();

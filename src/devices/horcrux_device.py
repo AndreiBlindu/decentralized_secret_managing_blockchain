@@ -39,6 +39,10 @@ def check_smart_contract(partial_key):
 def receive_partial_keys():
     partial_key = request.get_json()['partialKey']
     print(partial_key)
+    encryption_key = request.get_json()['privateKey']
+    print(encryption_key)
+    nonce = request.get_json()['nonce']
+    print(nonce)
     # once it receives the partial key it schedules the smart contract checking task
     #app.apscheduler.add_job(func=check_smart_contract, trigger='interval', args=[partial_key], id='0')
     return "OK", 200
