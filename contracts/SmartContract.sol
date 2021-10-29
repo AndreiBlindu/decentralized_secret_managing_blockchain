@@ -7,7 +7,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract SmartContract {
     string public fileHash;     // hash to retrieve the encrypted file from IPFS
-    uint256 public secretKey;    // key to decrypt the secret file
+    //uint256 public secretKey; (not needed)    // key to decrypt the secret file
 
     string private passwordInhibit;  // to inhibit revelation for a certain time (timeout)
     string private passwordLock;    // to disable revelation for undefined time
@@ -27,6 +27,7 @@ contract SmartContract {
     PartialKey[] public partialKeys;  // dynamic size array that stores the partial keys received by the devices
     uint public THRESHOLD;   // minimum numeber of shares required to reconstruct the secret
     uint public currentSharesNumber = 0;    // current number of partial keys in the smart contract
+    string public publicKey;    // public key that decrypts the shares encrypted by horcruxes with their private key
 
 
     function setEnableRevelation(bool _flag) private {
@@ -111,5 +112,8 @@ contract SmartContract {
     }
     function setThreshold(uint _threshold) public{
         THRESHOLD = _threshold;
+    }
+    function setPublicKey(string memory _publicKey) public {
+        publicKey = _publicKey;
     }
 }
