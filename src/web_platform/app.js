@@ -21,7 +21,7 @@
 
     var horcruxPublicKey;
     var horcruxPrivateKey;
-    var nonce = 0;
+    var nonce = "";
 
     async function activateSmartContract() {
         const Web3 = require('web3');
@@ -78,6 +78,16 @@
         console.log("Smart Contract activated and parameters successfully uploaded!");
     }
 
+    function generateRandomString(length) {
+        var result           = '';
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (let i = 0; i < length; i++ ) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
     function generateRSAKeys() {
         var forge = require('node-forge');
 
@@ -94,9 +104,9 @@
         // the private key is going to be sent to the horcruxes together with the shamir's partial key and the nonce
         // while the public key is going to be put on the smart contract
 
-        // Now we generate the nonce that is a pseudo-random generated number that will allow us
+        // Now we generate the nonce that is a short random generated string that will allow us
         // to identify that a message is coming from an authorized horcrux and not from a fake one
-        nonce = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+        nonce = generateRandomString(2);
         // the nonce is saved in local storage
         window.localStorage.setItem('nonce', nonce);
     }

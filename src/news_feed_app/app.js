@@ -61,8 +61,11 @@
             }
             console.log(partialKeys);
             
-            // qui devo mettere codice per decrittare le chiavi parziali con la chiave pubblica messa sulla blockchain
-            // e successivamente usarle per ricostruire la chiave segreta attraverso l'interpolazione di lagrange
+            /*
+             qui devo mettere codice per decrittare le chiavi parziali con la chiave pubblica messa sulla blockchain
+             e successivamente usarle per ricostruire la chiave segreta attraverso l'interpolazione di lagrange
+            */
+
         } else {
             console.log("There are not enough partial keys to reconstruct the secret decryption key yet!");
             document.getElementById("secret").innerHTML = 
