@@ -14,6 +14,9 @@
     var timeout = 0;
     var hash = "";
 
+    const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
+    const abi = require('../../build/contracts/SmartContract.json').abi;
+
     // total number of shares
     const TOTALE_SHARES  = 5;
     // the minimum required to recover
@@ -31,11 +34,6 @@
         // Retrieve accounts from the local node
         const accounts = await web3.eth.getAccounts();
         console.log(accounts);
-        
-        const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
-
-        const abi = require('../../build/contracts/SmartContract.json').abi;
-        console.log(abi);
 
         // Set up a web3 contract, representing our deployed contract instance
         const myContract = new web3.eth.Contract(abi, address);
@@ -220,12 +218,15 @@
 
         // together with the partialKey we send also the private key and 
         // the nonce to the horcruxes
+        // and also the smart contract address and abi
         fetch(url, {
             method: "POST",                
             body: JSON.stringify({ 
                 "partialKey" : partialKey, 
                 "privateKey" : horcruxPrivateKey,
-                "nonce" : nonce
+                "nonce" : nonce,
+                "address" : address,
+                "abi" : abi
             }),
             headers: {"Content-Type": "application/json"}
         }).catch((error) => {
@@ -372,10 +373,11 @@
 
             // Activate smart contract on the blockchain and set the parameters
             activateSmartContract();
-
+                
             // Split the secret key in partial keys with Shamir's algorithm 
-            // and write them in a config file
+            // and share them with the devices
             shamirSecretSharing(key);
+            
         });
 
         document.getElementById("showKeyButton").addEventListener("click", () => {

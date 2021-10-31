@@ -7634,12 +7634,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xb2B1Ec5165FD3fdf4A9F6DdaeE03D06B91b3288C",
-      "transactionHash": "0xf76331fe69b6dca8f27078be1f3f11edead28420d27d1fab825a905e35b5d746"
+      "address": "0x8499df0E6deaF237E1f239a85B825c9E6af3C7FC",
+      "transactionHash": "0x599e79581f99afb061b8a3fb9fce7b37e05ac75337cddaad863930a71a5b77ae"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-10-30T07:45:52.588Z",
+  "updatedAt": "2021-10-31T07:21:23.430Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": ": Andrei-Stefan Blindu",
