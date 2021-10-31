@@ -27,7 +27,7 @@ def check_smart_contract(partial_key, smart_contract, account):
     print("Checking smart contract ...")
     
     # check the contract to verify if the conditions for secret revelation are met
-    if not(smart_contract.functions.checkReveal().call()):
+    if smart_contract.functions.checkReveal().call():
         # send the partial key to the smart contract
         smart_contract.functions.sendPartialKey(partial_key[0], partial_key[1]).transact({"from" : account})
         # once we sent the partial key we stop the checking task to avoid sending it many times
