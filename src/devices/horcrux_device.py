@@ -28,12 +28,17 @@ def check_smart_contract(partial_key, smart_contract, account):
     
     # check the contract to verify if the conditions for secret revelation are met
     if smart_contract.functions.checkReveal().call():
+        print("Secret revealed! Sending partial keys ...")
+        print(partial_key)
         # send the partial key to the smart contract
         smart_contract.functions.sendPartialKey(partial_key[0], partial_key[1]).transact({"from" : account})
         # once we sent the partial key we stop the checking task to avoid sending it many times
         scheduler.remove_job('0')
+    else :
+        print("Secret not revealed yet")
 
     time.sleep(2) # check the smart contract every 2 seconds
+
 
 def encrypt_share(share, key_pem, nonce):
     key = RSA.importKey(key_pem)
@@ -43,18 +48,20 @@ def encrypt_share(share, key_pem, nonce):
     # Add the nonce to them
     share_x = str(share[0]) + str(nonce) 
     share_y = str(share[1]) + str(nonce)
-    print(share_x)
-    print(share_y)
 
     # UTF-8 Encoding : because encryption works with bytes not strings
     # Then Encryption with the key received by the horcrux
     enc_share_x = cipher.encrypt(share_x.encode('utf-8'))
     enc_share_y = cipher.encrypt(share_y.encode('utf-8'))
+    print(enc_share_x)
+    print(enc_share_y)
 
     # After encryption Base64 Encode is used to get binary data into ASCII characters,
     # so our encrypted share can be easily trasmitted as text
     encrypted_share = [base64.b64encode(enc_share_x),base64.b64encode(enc_share_y)]
+    #encrypted_share = [str(enc_share_x),str(enc_share_y)]
     return encrypted_share
+
 
 # API to receive the partial keys
 @app.route('/sharePartialKeys', methods=['POST'])
@@ -73,7 +80,7 @@ def receive_partial_keys():
     if web3_connection.isConnected():
         smart_contract = web3_connection.eth.contract(address=address, abi=abi)
         if (smart_contract):
-            # once it has the partial key and connects to the smart contract it schedules the smart contract checking task
+            # once it has the partial key and is connected to the smart contract it schedules the smart contract checking task
             app.apscheduler.add_job(func=check_smart_contract, trigger='interval', args=[partial_key, smart_contract, account], id='0')
 
     return "OK", 200

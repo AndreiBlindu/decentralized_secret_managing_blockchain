@@ -67,6 +67,10 @@
         // to divide it in smaller substrings
         let i=0;
         let step=30;
+        // first we clear the public key array on the smart contract to avoid writing the same thing
+        // multiple times 
+        await myContract.methods.clearPublicKey()
+        .send({ from: accounts[0] });
         do {
             await myContract.methods.setPublicKey(horcruxPublicKey.substring(i, i+step))
             .send({ from: accounts[0] });
@@ -262,30 +266,7 @@
     }
 
     function shamirSecretSharing(secret) {
-        /*const { split, join } = require('shamir');
-        const { randomBytes } = require('crypto');
-
-        // convert between string and Uint8Array
-        const utf8Encoder = new TextEncoder();
-
-        const utf8Decoder = new TextDecoder();
         
-        const secretBytes = utf8Encoder.encode(secret);
-        // parts is a object whos keys are the part number and 
-        // values are shares of type Uint8Array
-        console.log("secretBytes : " + secretBytes);
-
-        const partialKeys = split(randomBytes, TOTALE_SHARES, THRESHOLD, secretBytes);
-        console.log("Partial Keys : ");
-        console.log(partialKeys);
-
-        const recovered = join(partialKeys);
-        console.log(utf8Decoder.decode(recovered));
-
-        // send partial keys to devices
-        var partialKeysArray = Array.from(partialKeys);
-        sendPartialKeys2Devices(partialKeysArray);*/
-
         var secretValue = parseInt(secret);
 
         do {

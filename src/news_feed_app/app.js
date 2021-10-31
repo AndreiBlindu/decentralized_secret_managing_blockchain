@@ -1,5 +1,7 @@
 (() => {
 
+    var forge = require('node-forge');
+
     function reconstructSecret(f,n)
     {
         let result = 0; // Initialize result
@@ -21,13 +23,50 @@
         return Math.round(result);
     }
 
+    async function getPublicKeyFromSmartContract(myContract) {
+        let publicKey = "";
+        let publicKeySubstringsNumber = await myContract.methods.getPublicKeySubstringsNumber().call();
+        console.log(publicKeySubstringsNumber);
+        for (let i=0; i < publicKeySubstringsNumber; i++) {
+            publicKey += (await myContract.methods.publicKey(i).call());
+        }
+        return publicKey;
+    }
+
+    function decryptShare(encryptedPartialKey, publicKeyPem) {
+        
+        // Decode base64 encoding
+        var enc_share_x = atob(encryptedPartialKey[0]);
+        var enc_share_y = atob(encryptedPartialKey[1]);
+        console.log(enc_share_x);
+        console.log(enc_share_y);
+
+        //var enc_share_x = encryptedPartialKey[0];
+        //var enc_share_y = encryptedPartialKey[1];
+
+        const key = forge.pki.privateKeyFromPem(publicKeyPem);
+
+        var share_x = key.decrypt(enc_share_x);     // ERRORE : Block not valid
+        var share_y = key.decrypt(enc_share_y);
+        console.log(share_x);
+        console.log(share_y);
+
+        return [0,0];
+    }
+
+    function decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber) {
+        var partialKeys = [];
+        for (let i=0; i < sharesNumber; i++) {
+            partialKeys.push(decryptShare(encryptedPartialKeys[i], publicKey));
+        }
+        return partialKeys;
+    }
+
     async function requestSecretFromSmartContract() {
         const Web3 = require('web3');
         // Set up web3 object, connected to the local development network
         //const web3 = new Web3('http://localhost:7545');
         var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
-        // Retrieve accounts from the local node
-        const accounts = await web3.eth.getAccounts();
 
         const address = require('../../build/contracts/SmartContract.json').networks[5777].address;
         console.log(address);
@@ -44,27 +83,25 @@
         var sharesNumber = await myContract.methods.currentSharesNumber().call();
         console.log(sharesNumber);
 
-        var publicKey = "";
-        var partialKeys = [];
+        var encryptedPartialKeys = [];
         var secretKey;
 
         if (sharesNumber >= threshold) {
-            // Get the partial keys from the smart contract
-            let publicKeySubstringsNumber = await myContract.methods.getPublicKeySubstringsNumber().call();
-            for (let i=0; i < publicKeySubstringsNumber; i++) {
-                publicKey += (await myContract.methods.publicKey(i).call());
-            }
+            // Get horcrux public key from the smart contract
+            var publicKey = await getPublicKeyFromSmartContract(myContract);
             console.log(publicKey);
 
+            // Get the partial keys from the smart contract
             for (let i=0; i < sharesNumber; i++) {
-                partialKeys.push(await myContract.methods.partialKeys(i).call());
+                encryptedPartialKeys.push(await myContract.methods.partialKeys(i).call());
             }
-            console.log(partialKeys);
+            console.log("Encrypted partial keys :");
+            console.log(encryptedPartialKeys);
             
-            /*
-             qui devo mettere codice per decrittare le chiavi parziali con la chiave pubblica messa sulla blockchain
-             e successivamente usarle per ricostruire la chiave segreta attraverso l'interpolazione di lagrange
-            */
+            var partialKeys = decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber);
+            //decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber);
+
+            //secretKey = reconstructSecret(partialKeys, threshold);
 
         } else {
             console.log("There are not enough partial keys to reconstruct the secret decryption key yet!");

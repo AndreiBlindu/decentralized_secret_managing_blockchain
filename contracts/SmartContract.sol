@@ -20,8 +20,8 @@ contract SmartContract {
     int private requestCounter = 0;
 
     struct PartialKey {     // define the structure of a partialKey
-        uint256 x;
-        uint256 y;
+        string x;
+        string y;
     }
 
     PartialKey[] public partialKeys;  // dynamic size array that stores the partial keys received by the devices
@@ -77,15 +77,15 @@ contract SmartContract {
 
     // CHECK IF THE CONDITIONS FOR REVELATION ARE MET 
     // This function is called by the devices that monitor the smart contract
-    function checkReveal() public returns(bool){
-        requestCounter++;   // modify the state of the contract in order to mine another block and update the timestamp
+    function checkReveal() public view returns(bool){
+        //requestCounter++;   // modify the state of the contract in order to mine another block and update the timestamp
         return ((block.timestamp > timeout) && enableRevelation);
     }
 
     
     // FUNCTIONS THAT ALLOW THE SMART CONTRACT TO RECEIVE PARTIAL KEYS FROM THE DEVICES
     // AND USE THEM TO RECONSTRUCT THE SECRET KEY
-    function sendPartialKey(uint256 _partialKey_x, uint256 _partialKey_y) public {
+    function sendPartialKey(string memory _partialKey_x, string memory _partialKey_y) public {
         PartialKey memory partialKey = PartialKey(_partialKey_x, _partialKey_y);
         partialKeys.push(partialKey);
         currentSharesNumber = partialKeys.length;
@@ -94,6 +94,12 @@ contract SmartContract {
     // FUNCTION THAT RETURNS THE NUMBER OF SUBSTRINGS OF THE PUBLIC KEY
     function getPublicKeySubstringsNumber() public view returns (uint) {
         return publicKey.length;
+    }
+
+    // CLEAR PUBLIC KEY ARRAY
+    function clearPublicKey() public {
+        delete publicKey;
+        // equivalent publicKey.length = 0
     }
     
 
