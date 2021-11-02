@@ -11,6 +11,7 @@ from flask_apscheduler import APScheduler
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+from Crypto.Cipher import PKCS1_v1_5
 import base64
 
 import json
@@ -42,7 +43,8 @@ def check_smart_contract(partial_key, smart_contract, account):
 
 def encrypt_share(share, key_pem, nonce):
     key = RSA.importKey(key_pem)
-    cipher = PKCS1_OAEP.new(key)
+    #cipher = PKCS1_OAEP.new(key)
+    cipher = PKCS1_v1_5.new(key)    # javascript doesn't support OAEP but only v1_5
 
     # Separate the x and y components of the share
     # Add the nonce to them

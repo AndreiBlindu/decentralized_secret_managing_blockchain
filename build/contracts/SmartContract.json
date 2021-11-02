@@ -7726,12 +7726,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x7BB531ED3c5c86171A167860E4655870AA34e354",
-      "transactionHash": "0x142205155ebf453d9c3425eaeaf3758091b19b216c3ff7f6677f882090b478b6"
+      "address": "0x428Ad1c51096555Ac6946aD39b9E13A8187809C2",
+      "transactionHash": "0x6a562ad67ef9861db47a43d9cf145cd7bf6fd109ab84d1126207c440b8e51e9d"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-10-31T15:05:18.938Z",
+  "updatedAt": "2021-11-02T14:12:02.763Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": ": Andrei-Stefan Blindu",

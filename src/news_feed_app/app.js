@@ -1,6 +1,19 @@
+/**
+ * @author Andrei-Stefan Blindu
+ */
+
 (() => {
 
     var forge = require('node-forge');
+
+    function NonceException(message) {
+        this.message = message;
+        this.name = 'Nonce Exception';
+    }
+
+    NonceException.prototype.toString = function() {
+        return '${this.name}: "${this.message}"';
+    }
 
     function reconstructSecret(f,n)
     {
@@ -33,31 +46,60 @@
         return publicKey;
     }
 
+    function verifyAndRemoveNonce(value) {
+        // retrieve nonce from where it was saved
+        let nonce = localStorage.getItem('nonce');
+        
+        let nonceLength = nonce.length;
+        let valueLength = value.length;
+
+        if (value.substring(valueLength-nonceLength, valueLength) === nonce) {
+            // return the value string without the nonce
+            return value.substring(0, valueLength-nonceLength);
+        } else {
+            // if the nonce is not valid throws an exception
+            throw new NonceException("nonce is not valid!");
+        }
+    }
+
     function decryptShare(encryptedPartialKey, publicKeyPem) {
         
         // Decode base64 encoding
-        var enc_share_x = atob(encryptedPartialKey[0]);
-        var enc_share_y = atob(encryptedPartialKey[1]);
+        //var enc_share_x = atob(encryptedPartialKey[0]);   atob is deprecated
+        var enc_share_x = forge.util.decode64(encryptedPartialKey[0]);
+        var enc_share_y = forge.util.decode64(encryptedPartialKey[1]);
         console.log(enc_share_x);
         console.log(enc_share_y);
 
-        //var enc_share_x = encryptedPartialKey[0];
-        //var enc_share_y = encryptedPartialKey[1];
-
         const key = forge.pki.privateKeyFromPem(publicKeyPem);
 
-        var share_x = key.decrypt(enc_share_x);     // ERRORE : Block not valid
+        // Decryption
+        var share_x = key.decrypt(enc_share_x); 
         var share_y = key.decrypt(enc_share_y);
         console.log(share_x);
         console.log(share_y);
 
-        return [0,0];
+        // Now I have share_x = value + nonce (same for share_y)
+        // I have to evaluate the nonce and then remove it
+        try {
+            share_x = verifyAndRemoveNonce(share_x);
+            share_y = verifyAndRemoveNonce(share_y);
+        } catch(err) {
+            // if the nonce is not valid throws an exception
+            throw new NonceException("nonce not valid");
+        }
+
+        return [parseInt(share_x), parseInt(share_y)];
     }
 
     function decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber) {
         var partialKeys = [];
         for (let i=0; i < sharesNumber; i++) {
-            partialKeys.push(decryptShare(encryptedPartialKeys[i], publicKey));
+            try {
+                partialKeys.push(decryptShare(encryptedPartialKeys[i], publicKey));
+            } catch(err) {
+                console.log(err);
+            }
         }
         return partialKeys;
     }
@@ -99,7 +141,7 @@
             console.log(encryptedPartialKeys);
             
             var partialKeys = decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber);
-            //decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber);
+            console.log(partialKeys);
 
             //secretKey = reconstructSecret(partialKeys, threshold);
 
