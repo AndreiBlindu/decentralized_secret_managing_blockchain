@@ -143,7 +143,8 @@
             var partialKeys = decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber);
             console.log(partialKeys);
 
-            //secretKey = reconstructSecret(partialKeys, threshold);
+            secretKey = reconstructSecret(partialKeys, threshold);
+            document.getElementById("secret").innerHTML = "<h3>Secret key : </h3>" + secretKey;
 
         } else {
             console.log("There are not enough partial keys to reconstruct the secret decryption key yet!");

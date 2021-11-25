@@ -26,6 +26,9 @@ scheduler.start()
 
 def check_smart_contract(partial_key, smart_contract, account):
     print("Checking smart contract ...")
+
+    deadline = int(smart_contract.functions.timeout().call())
+    print("Deadline :",time.strftime("%D %H:%M:%S", time.localtime(deadline)))
     
     # check the contract to verify if the conditions for secret revelation are met
     if smart_contract.functions.checkReveal().call():
@@ -61,7 +64,7 @@ def encrypt_share(share, key_pem, nonce):
     # After encryption Base64 Encode is used to get binary data into ASCII characters,
     # so our encrypted share can be easily trasmitted as text
     encrypted_share = [base64.b64encode(enc_share_x),base64.b64encode(enc_share_y)]
-    #encrypted_share = [str(enc_share_x),str(enc_share_y)]
+    
     return encrypted_share
 
 

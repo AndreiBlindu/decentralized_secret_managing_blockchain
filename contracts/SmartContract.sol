@@ -11,11 +11,10 @@ contract SmartContract {
 
     string private passwordInhibit;  // to inhibit revelation for a certain time (timeout)
     string private passwordLock;    // to disable revelation for undefined time
-    //string private passwordUnlock;  // to enable revelation
     string private passwordImmediateReveal; // to reveal instantly
 
     bool private enableRevelation = true;
-    uint256 public timeout; 
+    uint256 public timeout;     // Aggiungere funzionalità che richiama property timeout per vedere quanto manca alla scadenza
     uint256 private timeSpan;   // time span the secret remains inhibited for   
     int private requestCounter = 0;
 
@@ -25,7 +24,7 @@ contract SmartContract {
     }
 
     PartialKey[] public partialKeys;  // dynamic size array that stores the partial keys received by the devices
-    uint public THRESHOLD;   // minimum numeber of shares required to reconstruct the secret
+    uint public THRESHOLD;   // minimum number of shares required to reconstruct the secret
     uint public currentSharesNumber = 0;    // current number of partial keys in the smart contract
     string[] public publicKey;    // public key that decrypts the shares encrypted by horcruxes with their private key
     // it's an array because since it's a very long string there's the risk of going out of gas if we get it from a 
@@ -34,11 +33,6 @@ contract SmartContract {
 
     function setEnableRevelation(bool _flag) private {
         enableRevelation = _flag;
-        /*if (_flag) {
-            // if revelation was disabled just setting enableRevelation to true is not enough,
-            // we have to update the timeout to a future value as well
-            setTimeout(timeSpan);
-        }*/
     }
 
     function instantRevelation() private {
@@ -62,11 +56,6 @@ contract SmartContract {
             setEnableRevelation(false);
             return "Secret revelation disabled for undefined time";
         }
-        /*else if (keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(passwordUnlock))) {
-            setEnableRevelation(true);
-            return string(abi.encodePacked("Secret revelation enabled. The secret will be revealed ",
-                                            timeSpan, " seconds from now"));
-        }*/
         else if (keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(passwordImmediateReveal))) {
             instantRevelation();
             return "The secret has been revealed!";
@@ -113,9 +102,6 @@ contract SmartContract {
     function setPasswordLock(string memory _passwordLock) public {
         passwordLock = _passwordLock;
     }
-    /*function setPasswordUnlock(string memory _passwordUnlock) public {
-        passwordUnlock = _passwordUnlock;
-    }*/
     function setPasswordImmediateReveal(string memory _passwordImmediateReveal) public {
         passwordImmediateReveal = _passwordImmediateReveal;
     }

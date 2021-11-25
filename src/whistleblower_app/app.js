@@ -36,8 +36,8 @@
         console.log(myContract);
 
         var response = await myContract.methods.action(hashedPassword)
-        .call();
-        //.send({ from: accounts[0] });
+        //.call();
+        .send({ from: accounts[0] });
         console.log(response);
         return response;
     }

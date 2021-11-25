@@ -325,6 +325,7 @@
 
             // random generated key
             key = "" + Math.floor(Math.random() * (Number.MAX_SAFE_INTEGER/100));  // key must be a string
+            // cerco altre funzioni per generare numeri crittografici robusti invece di math.random
             console.log(key);
 
             encryptAndUpload2IPFS(file);
