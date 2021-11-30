@@ -75,25 +75,34 @@ pip install web3
 ## How to run the project
 ### 1. Compile smart contracts and deploy to Ganache
 1.a) run Ganache
+
 1.b) truffle compile
+
 2.c) truffle migrate --reset
 
 ### 2. Update contract abi seen by the js scripts
 Inside src/web_platform, src/whistleblower_app, src/newsfeed_app run the following command : 
+
 browserify app.js -o bundle.js
 
 ### 3. Activate 5 devices and run web_platform
 3.a) cd src/devices
+
 3.b) python horcrux_device.py 0 
+
 3.c) open other 4 terminals and do the same with parameters 1,2,3,4
+
 3.d) cd src/web_platform
+
 3.e) run index.html
 
 ### 4. Run whisleblower's app
 4.a) cd src/whisleblower_app
+
 4.b) run index.html
 
 ### 5. Run news feed app
 5.a) cd src/news_feed_app
+
 5.b) run index.html
 
