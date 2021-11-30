@@ -5,6 +5,11 @@
 (() => {
 
     var forge = require('node-forge');
+    var secretKey;
+    var fileHash;
+    var isRevealed = false;
+
+    var CryptoJS = require('crypto-js');
 
     function NonceException(message) {
         this.message = message;
@@ -118,6 +123,9 @@
         const myContract = new web3.eth.Contract(abi, address);
         console.log(myContract);
 
+        // Get the hash of the file
+        fileHash = await myContract.methods.fileHash().call();
+
         // Get the number of shares needed to reconstruct the secret from the smart contract
         var threshold = await myContract.methods.THRESHOLD().call();
         console.log(threshold);
@@ -126,7 +134,6 @@
         console.log(sharesNumber);
 
         var encryptedPartialKeys = [];
-        var secretKey;
 
         if (sharesNumber >= threshold) {
             // Get horcrux public key from the smart contract
@@ -143,21 +150,57 @@
             var partialKeys = decryptPartialKeys(encryptedPartialKeys, publicKey, sharesNumber);
             console.log(partialKeys);
 
-            secretKey = reconstructSecret(partialKeys, threshold);
+            secretKey = "" + reconstructSecret(partialKeys, threshold); // secret key must be a string
             document.getElementById("secret").innerHTML = "<h3>Secret key : </h3>" + secretKey;
+
+            isRevealed = true;
 
         } else {
             console.log("There are not enough partial keys to reconstruct the secret decryption key yet!");
             document.getElementById("secret").innerHTML = 
             "There are not enough partial keys to reconstruct the secret decryption key yet!";
-        }
 
-        return secretKey;
+            isRevealed = false;
+        }
 
     }
 
+    function decryptFile(fileContent) {
+        console.log("\n\n\n");
+        var decryptedContent = CryptoJS.AES.decrypt(fileContent, secretKey).toString(CryptoJS.enc.Utf8);
+        console.log(decryptedContent);
+    }
+
+    function retrieveFileFromIPFSAndDecrypt() {
+        const ipfsAPI = require('ipfs-api');
+        // connect to ipfs daemon API server
+        const ipfs = ipfsAPI('ipfs.infura.io', '5001', {protocol: 'https'});
+
+        // retrieve the encrypted file from IPFS through its hash
+        ipfs.files.get(fileHash, function(err, files) {
+            files.forEach((file) => {
+                var fileContent = file.content.toString('utf-8');
+                console.log(fileContent);
+                // decrypt the file    
+                decryptFile(fileContent);
+            })
+        });
+    }
+
+    async function run() {
+        document.getElementById("secret").innerHTML = "Searching for the secret ...";
+
+        await requestSecretFromSmartContract();
+        console.log(secretKey);
+        console.log(fileHash);
+
+        if (isRevealed) {
+            retrieveFileFromIPFSAndDecrypt();
+        }
+    }
+
     window.onload = () => {
-        var secretKey = requestSecretFromSmartContract();
+        run();
     }
 
 })();
