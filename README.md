@@ -85,7 +85,7 @@ Inside src/web_platform, src/whistleblower_app, src/newsfeed_app run the followi
 
 browserify app.js -o bundle.js
 
-### 3. Activate 5 devices and run web_platform
+### 3. Activate 5 devices and run web platform
 3.a) cd src/devices
 
 3.b) python horcrux_device.py 0 
