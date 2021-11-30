@@ -169,6 +169,7 @@
         console.log("\n\n\n");
         var decryptedContent = CryptoJS.AES.decrypt(fileContent, secretKey).toString(CryptoJS.enc.Utf8);
         console.log(decryptedContent);
+        document.getElementById("fileContent").innerHTML = "<h3>Secret file content : </h3>" + decryptedContent;
     }
 
     function retrieveFileFromIPFSAndDecrypt() {
